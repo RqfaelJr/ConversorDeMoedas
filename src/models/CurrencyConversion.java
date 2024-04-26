@@ -9,24 +9,28 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+import static java.net.http.HttpClient.newHttpClient;
+
 public class CurrencyConversion {
 
     public float getConvertedValue(String currentCurrency, String newCurrency, float currentMoney) {
         Gson gson = new Gson();
 
-        String API_KEY = "bad9403ebfb19e33788d79d4";
+        String API_KEY = "Change to your API Key";
 
         try {
             URI url = URI.create("https://v6.exchangerate-api.com/v6/" + API_KEY + "/latest/" + currentCurrency);
 
-            HttpClient client = HttpClient.newHttpClient();
+            HttpResponse<String> response;
+            try (HttpClient client = newHttpClient()) {
 
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(url)
-                    .build();
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(url)
+                        .build();
 
-            HttpResponse<String> response = client
-                    .send(request, HttpResponse.BodyHandlers.ofString());
+                response = client
+                        .send(request, HttpResponse.BodyHandlers.ofString());
+            }
             JsonObject jsonObject = gson.fromJson(response.body(), JsonObject.class);
             JsonObject currencies = jsonObject.getAsJsonObject("conversion_rates");
             float currencyPrice = currencies.get(newCurrency).getAsFloat();
